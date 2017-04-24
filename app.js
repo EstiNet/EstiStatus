@@ -1,20 +1,14 @@
-var express = require('express');
-var path = require('path');
-var favicon = require('serve-favicon');
-var logger = require('morgan');
-var cookieParser = require('cookie-parser');
-var bodyParser = require('body-parser');
-
-var index = require('./routes/index');
-var users = require('./routes/users');
-
 var mcping = require('mc-ping-updated');
-
+var express = require('express');
 var app = express();
-
-// view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'pug');
+var fs = require('fs');
+var https = require('https');
+var server = https.createServer({
+    key: fs.readFileSync('key.pem'),
+    cert: fs.readFileSync('cert.pem'),
+    passphrase: 'test'
+}, app);
+var io = require('socket.io')(server);
 
 var mcservers = [{name: "BungeeCord", ip: "localhost", port: "25565", state: "off", players: "0"},
                  {name: "Hub", ip: "internal.estinet.net", port: "25400", state: "off", players: "0"},
@@ -26,15 +20,13 @@ var mcservers = [{name: "BungeeCord", ip: "localhost", port: "25565", state: "of
                  {name: "gWars", ip: "internal.estinet.net", port: "8104", state: "off", players: "0"},
                  {name: "Development", ip: "internal.estinet.net", port: "8105", state: "off", players: "0"},
                  {name: "Survival2", ip: "dolphinbox.net", port: "25500", state: "off", players: "0"}];
-
 var web = "https://estinet.net";
 
 setInterval(checkStatus, 5000);
-
-
 function checkStatus(){
     mcservers.forEach(function(data, index){
-        mcping(data.ip, data.port, function(err, res) {
+        mcping(data.ip, parseInt(data.port), function(err, res) {
+            //console.log(err + " " + res + " " + data.ip + " " + data.port + " " + index);
             if (err) {
                 mcservers[index].state = "off";
             } else {
@@ -45,34 +37,17 @@ function checkStatus(){
     });
     console.log(mcservers);
 }
-
-// uncomment after placing your favicon in /public
-//app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
-app.use(logger('dev'));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
-
-app.use('/', index);
-app.use('/users', users);
-
-// catch 404 and forward to error handler
-app.use(function(req, res, next) {
-  var err = new Error('Not Found');
-  err.status = 404;
-  next(err);
+app.use(express.static('views'));
+app.use(function(req, res, next){
+    console.log('[ERROR] Client error 404');
+    res.sendFile(__dirname + '/views/404.html');
 });
 
-// error handler
-app.use(function(err, req, res, next) {
-  // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
-
-  // render the error page
-  res.status(err.status || 500);
-  res.render('error');
+//Socket.io
+io.on('connection', function(socket){
+    console.log('[INFO] New Socket.io client connection.');
+    socket.emit('data', mcservers);
 });
 
-module.exports = app;
+
+server.listen(443);
