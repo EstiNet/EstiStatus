@@ -1,13 +1,7 @@
 var mcping = require('mc-ping-updated');
 var express = require('express');
 var app = express();
-var fs = require('fs');
-var https = require('https');
-var server = https.createServer({
-    key: fs.readFileSync('key.pem'),
-    cert: fs.readFileSync('cert.pem'),
-    passphrase: 'test'
-}, app);
+var server = require('http').createServer(app);
 var io = require('socket.io')(server);
 
 var mcservers = [{name: "BungeeCord", ip: "localhost", port: "25565", state: "off", players: "0"},
@@ -50,4 +44,4 @@ io.on('connection', function(socket){
 });
 
 
-server.listen(443);
+server.listen(80);
