@@ -34,9 +34,9 @@ setInterval(checkStatus, 5000);
 
 function checkStatus(){
     mcservers.forEach(function(data, index){
-        mcping('example.com', 25565, function(err, res) {
+        mcping(data.ip, data.port, function(err, res) {
             if (err) {
-               mcservers[index].state = "off";
+                mcservers[index].state = "off";
             } else {
                 mcservers[index].state = "on";
                 mcservers[index].players = res.players.online;
