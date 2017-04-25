@@ -4,6 +4,8 @@ var app = express();
 var server = require('http').createServer(app);
 var io = require('socket.io')(server);
 
+var sockets = {};
+
 var mcservers = [{name: "BungeeCord", ip: "localhost", port: "25565", state: "off", players: "0"},
                  {name: "Hub", ip: "internal.estinet.net", port: "25400", state: "off", players: "0"},
                  {name: "Minigame Hub", ip: "internal.estinet.net", port: "25450", state: "off", players: "0"},
@@ -29,6 +31,7 @@ function checkStatus(){
             }
         }, 3000);
     });
+
     console.log(mcservers);
 }
 app.use(express.static('views'));
@@ -41,6 +44,10 @@ app.use(function(req, res, next){
 io.on('connection', function(socket){
     console.log('[INFO] New Socket.io client connection.');
     socket.emit('data', mcservers);
+    sockets[socket.id] = socket;
+});
+io.on('disconnect', function(socket){
+    delete sockets[socket.id];
 });
 
 
