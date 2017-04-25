@@ -18,7 +18,7 @@ var mcservers = [{name: "BungeeCord", ip: "localhost", port: "25565", state: "of
                  {name: "Survival2", ip: "dolphinbox.net", port: "25500", state: "off", players: "0"}];
 var web = "https://estinet.net";
 
-setInterval(checkStatus, 5000);
+setInterval(checkStatus, 4000);
 function checkStatus(){
     mcservers.forEach(function(data, index){
         mcping(data.ip, parseInt(data.port), function(err, res) {
@@ -30,6 +30,10 @@ function checkStatus(){
                 mcservers[index].players = res.players.online;
             }
         }, 3000);
+    });
+
+    Object.keys(sockets).forEach(function(key,index) {
+        sockets[key].emit('data', mcservers);
     });
 
     console.log(mcservers);
