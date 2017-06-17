@@ -15,7 +15,7 @@ var mcservers = [{name: "BungeeCord", ip: "localhost", port: "25565", state: "of
                  {name: "Skyblock", ip: "internal.estinet.net", port: "8103", state: "off", players: "0"},
                  {name: "gWars", ip: "internal.estinet.net", port: "8104", state: "off", players: "0"},
                  {name: "Development", ip: "internal.estinet.net", port: "8105", state: "off", players: "0"},
-                 {name: "Survival2", ip: "dolphinbox.net", port: "25500", state: "off", players: "0"}];
+                 {name: "Survival2", ip: "dolphinbox.net", port: "8106", state: "off", players: "0"}];
 var web = "https://estinet.net";
 
 setInterval(checkStatus, 4000);
